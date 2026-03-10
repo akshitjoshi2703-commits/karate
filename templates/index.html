@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Karate Learning Academy - Home{% endblock %}
+
+{% block content %}
+<div class="home-page">
+    <div class="hero">
+        <h1>🥋 Karate Learning Academy</h1>
+        <p>Master the art of karate at your own pace</p>
+    </div>
+
+    {% if progress %}
+    <div class="quick-stats">
+        <div class="stat">
+            <span class="icon">⭐</span>
+            <div>
+                <p>Points</p>
+                <h3>{{ progress.total_points }}</h3>
+            </div>
+        </div>
+        <div class="stat">
+            <span class="icon">🥋</span>
+            <div>
+                <p>Belt Level</p>
+                <h3>{{ progress.current_belt }}</h3>
+            </div>
+        </div>
+        <div class="stat">
+            <span class="icon">📚</span>
+            <div>
+                <p>Techniques</p>
+                <h3>{{ progress.completed_techniques }}</h3>
+            </div>
+        </div>
+        <div class="stat">
+            <span class="icon">💪</span>
+            <div>
+                <p>Drills</p>
+                <h3>{{ progress.completed_drills }}</h3>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>📚 Learn Techniques</h3>
+            <p>Discover fundamental and advanced karate techniques with detailed instructions and images</p>
+            <a href="/techniques" class="feature-link">Explore →</a>
+        </div>
+        <div class="feature-card">
+            <h3>🎬 Video Tutorials</h3>
+            <p>Watch step-by-step video demonstrations from expert instructors</p>
+            <a href="/videos" class="feature-link">Watch →</a>
+        </div>
+        <div class="feature-card">
+            <h3>💪 Interactive Drills</h3>
+            <p>Practice with guided drills to enhance your skills and consistency</p>
+            <a href="/drills" class="feature-link">Start →</a>
+        </div>
+        <div class="feature-card">
+            <h3>📊 Track Progress</h3>
+            <p>Monitor your learning journey and advance through belt levels</p>
+            <a href="/progress" class="feature-link">View →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

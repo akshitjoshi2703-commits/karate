@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Drills - Karate Learning Academy{% endblock %}
+
+{% block content %}
+<div class="drills">
+    <h2>Interactive Drills</h2>
+    <p class="subtitle">Practice to master your skills</p>
+
+    <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="All">All</button>
+        <button class="filter-btn" data-filter="Beginner">Beginner</button>
+        <button class="filter-btn" data-filter="Intermediate">Intermediate</button>
+        <button class="filter-btn" data-filter="Advanced">Advanced</button>
+    </div>
+
+    <div class="drills-grid" id="drillsGrid">
+        {% for drill in drills %}
+        <div class="drill-card" data-difficulty="{{ drill.difficulty }}" data-id="{{ drill.id }}">
+            <div class="drill-header">
+                <h3>{{ drill.name }}</h3>
+                {% if drill.id in completed %}
+                <span class="checkmark">✓</span>
+                {% endif %}
+            </div>
+            <p class="difficulty">{{ drill.difficulty }}</p>
+            <p class="duration">⏱️ {{ drill.duration }}</p>
+            <p class="description">{{ drill.description }}</p>
+            <p class="repetitions">Reps: {{ drill.repetitions }}x</p>
+            <button class="start-btn" onclick="openDrillModal({{ drill.id }})">Start Drill →</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="drillModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeDrillModal()">&times;</span>
+        <div id="drillModalBody"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const drills = {{ drills|tojson }};
+const completedDrills = {{ completed|tojson }};
+let timerInterval = null;
+
+function openDrillModal(id) {
+    const drill = drills.find(d => d.id === id);
+    const modal = document.getElementById('drillModal');
+    let html = `
+        <h2>${drill.name}</h2>
+        <p class="difficulty-badge">${drill.difficulty}</p>
+        <p class="modal-description">${drill.description}</p>
+        
+        <div class="timer-section">
+            <p>Duration: ${drill.duration}</p>
+            <div id="timerDisplay" style="display:none;">
+                <div class="timer">
+                    <p class="time" id="timerTime">00:00</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h4>Instructions:</h4>
+            <ol>
+                ${drill.instructions.map(i => `<li>${i}</li>`).join('')}
+            </ol>
+        </div>
+
+        <div class="modal-section">
+            <h4>💡 Tips:</h4>
+            <div class="tips">
+                ${drill.tips.map(t => `<div class="tip-item">• ${t}</div>`).join('')}
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="timer-btn" onclick="toggleTimer('${drill.duration}')">▶ Start Timer</button>
+    `;
+    
+    if (completedDrills.includes(id)) {
+        html += `<button class="complete-btn completed" disabled>✓ Completed</button>`;
+    } else {
+        html += `<button class="complete-btn" onclick="completeDrill(${id})">Mark Complete (+100 pts)</button>`;
+    }
+    
+    html += `</div>`;
+    
+    document.getElementById('drillModalBody').innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function closeDrillModal() {
+    if (timerInterval) clearInterval(timerInterval);
+    document.getElementById('drillModal').style.display = 'none';
+}
+
+function toggleTimer(duration) {
+    const timerDisplay = document.getElementById('timerDisplay');
+    const btn = event.target;
+    
+    if (timerDisplay.style.display === 'none') {
+        timerDisplay.style.display = 'block';
+        btn.textContent = '⏸️ Stop Timer';
+        startTimer(parseInt(duration) * 60);
+    } else {
+        timerDisplay.style.display = 'none';
+        btn.textContent = '▶ Start Timer';
+        if (timerInterval) clearInterval(timerInterval);
+    }
+}
+
+function startTimer(seconds) {
+    if (timerInterval) clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+        seconds--;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        document.getElementById('timerTime').textContent = 
+            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        
+        if (seconds <= 0) {
+            clearInterval(timerInterval);
+        }
+    }, 1000);
+}
+
+function completeDrill(id) {
+    fetch(`/api/drill/complete/${id}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                completedDrills.push(id);
+                document.querySelector(`[data-id="${id}"]`).classList.add('completed');
+                document.querySelector(`[data-id="${id}"] .checkmark`).innerHTML = '✓';
+                closeDrillModal();
+                alert(`Completed! +${data.points_earned} points`);
+            }
+        });
+}
+
+// Filter functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.dataset.filter;
+        const cards = document.querySelectorAll('.drill-card');
+        cards.forEach(card => {
+            if (filter === 'All' || card.dataset.difficulty === filter) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+
+window.onclick = function(event) {
+    const modal = document.getElementById('drillModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

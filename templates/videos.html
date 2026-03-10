@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Videos - Karate Learning Academy{% endblock %}
+
+{% block content %}
+<div class="video-tutorials">
+    <h2>Video Tutorials</h2>
+    <p class="subtitle">Learn from expert instructors</p>
+
+    <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="All">All</button>
+        <button class="filter-btn" data-filter="Striking">Striking</button>
+        <button class="filter-btn" data-filter="Defense">Defense</button>
+        <button class="filter-btn" data-filter="Forms">Forms</button>
+        <button class="filter-btn" data-filter="Combinations">Combinations</button>
+        <button class="filter-btn" data-filter="Fundamentals">Fundamentals</button>
+        <button class="filter-btn" data-filter="Sparring">Sparring</button>
+    </div>
+
+    <div class="videos-grid" id="videosGrid">
+        {% for video in videos %}
+        <div class="video-card" data-category="{{ video.category }}" data-id="{{ video.id }}">
+            <div class="video-thumbnail">
+                <span class="play-icon">▶</span>
+                <span class="duration">{{ video.duration }}</span>
+            </div>
+            <div class="video-info">
+                <h3>{{ video.title }}</h3>
+                <p class="instructor">By {{ video.instructor }}</p>
+                <p class="category">{{ video.category }}</p>
+                <p class="difficulty">{{ video.difficulty }}</p>
+                <p class="description">{{ video.description }}</p>
+                <button class="watch-btn" onclick="openVideoModal({{ video.id }})">Watch Video →</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="videoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeVideoModal()">&times;</span>
+        <div id="videoModalBody"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const videos = {{ videos|tojson }};
+
+function openVideoModal(id) {
+    const video = videos.find(v => v.id === id);
+    const modal = document.getElementById('videoModal');
+    let html = `
+        <div class="video-player">
+            <div class="player-placeholder">
+                <span class="play-icon">▶</span>
+                <p>Video Player</p>
+            </div>
+        </div>
+
+        <h2>${video.title}</h2>
+        <p class="instructor-info"><strong>Instructor:</strong> ${video.instructor}</p>
+        <p class="meta-info">
+            <span class="duration-badge">${video.duration}</span>
+            <span class="difficulty-badge">${video.difficulty}</span>
+            <span class="category-badge">${video.category}</span>
+        </p>
+
+        <div class="modal-description">
+            <h4>About this video:</h4>
+            <p>${video.description}</p>
+        </div>
+
+        <div class="learning-points">
+            <h4>What you'll learn:</h4>
+            <ul>
+                <li>Proper technique and form</li>
+                <li>Common mistakes to avoid</li>
+                <li>Practical applications</li>
+                <li>Practice tips for improvement</li>
+            </ul>
+        </div>
+
+        <div class="button-group">
+            <button class="play-full-btn">▶ Play Full Video</button>
+            <button class="watched-btn" onclick="markVideoWatched(${id})">Mark as Watched</button>
+        </div>
+    `;
+    
+    document.getElementById('videoModalBody').innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function closeVideoModal() {
+    document.getElementById('videoModal').style.display = 'none';
+}
+
+function markVideoWatched(id) {
+    alert('Video marked as watched!');
+    closeVideoModal();
+}
+
+// Filter functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.dataset.filter;
+        const cards = document.querySelectorAll('.video-card');
+        cards.forEach(card => {
+            if (filter === 'All' || card.dataset.category === filter) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+
+window.onclick = function(event) {
+    const modal = document.getElementById('videoModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

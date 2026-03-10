@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Techniques - Karate Learning Academy{% endblock %}
+
+{% block content %}
+<div class="techniques-library">
+    <h2>Technique Library</h2>
+    <p class="subtitle">Learn fundamental and advanced karate techniques</p>
+
+    <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="All">All</button>
+        <button class="filter-btn" data-filter="Striking">Striking</button>
+        <button class="filter-btn" data-filter="Defense">Defense</button>
+        <button class="filter-btn" data-filter="Forms">Forms</button>
+        <button class="filter-btn" data-filter="Stance">Stance</button>
+    </div>
+
+    <div class="techniques-grid" id="techniquesGrid">
+        {% for technique in techniques %}
+        <div class="technique-card" data-category="{{ technique.category }}" data-id="{{ technique.id }}">
+            <div class="technique-header">
+                <h3>{{ technique.name }}</h3>
+                {% if technique.id in completed %}
+                <span class="checkmark">✓</span>
+                {% endif %}
+            </div>
+            <p class="category">{{ technique.category }}</p>
+            <p class="difficulty">{{ technique.difficulty }}</p>
+            <p class="description">{{ technique.description }}</p>
+            <button class="learn-btn" onclick="openModal({{ technique.id }})">Learn More →</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="techniqueModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const techniques = {{ techniques|tojson }};
+const completed = {{ completed|tojson }};
+
+function openModal(id) {
+    const technique = techniques.find(t => t.id === id);
+    const modal = document.getElementById('techniqueModal');
+    let html = `
+        <h2>${technique.name}</h2>
+        <p class="modal-description">${technique.description}</p>
+        <div class="modal-section">
+            <h4>Steps to Execute:</h4>
+            <ol>
+                ${technique.steps.map((s, i) => `<li>${s}</li>`).join('')}
+            </ol>
+        </div>
+        <div class="modal-section">
+            <h4>Benefits:</h4>
+            <div class="benefits">
+                ${technique.benefits.map(b => `<span class="benefit-tag">${b}</span>`).join('')}
+            </div>
+        </div>
+    `;
+    
+    if (completed.includes(id)) {
+        html += `<button class="complete-btn completed" disabled>✓ Completed</button>`;
+    } else {
+        html += `<button class="complete-btn" onclick="completeTechnique(${id})">Mark as Complete (+50 pts)</button>`;
+    }
+    
+    document.getElementById('modalBody').innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('techniqueModal').style.display = 'none';
+}
+
+function completeTechnique(id) {
+    fetch(`/api/technique/complete/${id}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                completed.push(id);
+                document.querySelector(`[data-id="${id}"]`).classList.add('completed');
+                document.querySelector(`[data-id="${id}"] .checkmark`).innerHTML = '✓';
+                closeModal();
+                alert(`Completed! +${data.points_earned} points`);
+            }
+        });
+}
+
+// Filter functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.dataset.filter;
+        const cards = document.querySelectorAll('.technique-card');
+        cards.forEach(card => {
+            if (filter === 'All' || card.dataset.category === filter) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('techniqueModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}
