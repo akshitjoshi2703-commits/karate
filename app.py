@@ -106,7 +106,7 @@ TECHNIQUES = [
             'Keep your supporting leg bent for stability',
             'Extend your leg straight forward using hip flexors',
             'Strike with the ball of your foot (not toes)',
-            'Keep your body upright, don't lean back',
+            'Keep your body upright, don\'t lean back',
             'Retract quickly and return to stance'
         ],
         'common_mistakes': [
@@ -158,7 +158,7 @@ TECHNIQUES = [
             'Keep your supporting leg straight and strong',
             'Extend your leg straight out to the side',
             'Strike with the heel or edge of your foot',
-            'Keep your body upright, don't lean',
+            'Keep your body upright, don\'t lean',
             'Retract and return to stance'
         ],
         'common_mistakes': [
