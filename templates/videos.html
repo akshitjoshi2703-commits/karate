@@ -2,10 +2,226 @@
 
 {% block title %}Videos - Karate Learning Academy{% endblock %}
 
+<style>
+.ai-generator {
+    background: linear-gradient(135deg, #2c2c2c, #3a3a3a);
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    border: 1px solid #444;
+}
+
+.ai-generator h3 {
+    color: #89c4f4;
+    margin-top: 0;
+    font-size: 1.8em;
+}
+
+.generator-form {
+    margin: 20px 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.form-row select {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    font-size: 16px;
+    min-width: 200px;
+}
+
+.form-row select:focus {
+    outline: none;
+    border-color: #89c4f4;
+    box-shadow: 0 0 0 2px rgba(137, 196, 244, 0.2);
+}
+
+.ai-video-result {
+    margin-top: 30px;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    border: 1px solid #444;
+}
+
+.video-placeholder {
+    text-align: center;
+    padding: 40px;
+    background: #2c2c2c;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.ai-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pulse {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #89c4f4;
+    margin: 0 5px;
+    animation: pulse 1.5s infinite;
+}
+
+.pulse.delay {
+    animation-delay: 0.5s;
+}
+
+.pulse.delay2 {
+    animation-delay: 1s;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.ai-video-card {
+    background: #2c2c2c;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid #444;
+}
+
+.ai-generated {
+    background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+    position: relative;
+}
+
+.ai-icon {
+    font-size: 48px;
+    opacity: 0.7;
+}
+
+.ai-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #89c4f4;
+    color: #1a1a1a;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.ai-content {
+    margin-top: 20px;
+}
+
+.ai-content h4 {
+    color: #89c4f4;
+    margin-bottom: 10px;
+}
+
+.ai-content ol, .ai-content ul {
+    margin: 0 0 20px 0;
+    padding-left: 20px;
+}
+
+.ai-content li {
+    margin-bottom: 8px;
+    color: #e0e0e0;
+    line-height: 1.5;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.practice-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.practice-btn:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-row select {
+        min-width: auto;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+}
+</style>
+
 {% block content %}
 <div class="video-tutorials">
-    <h2>Video Tutorials</h2>
-    <p class="subtitle">Learn from expert instructors</p>
+    <h2>🎬 Video Tutorials & AI Content</h2>
+    <p class="subtitle">Learn from expert instructors and AI-generated content</p>
+
+    <!-- AI Video Generator -->
+    <div class="ai-generator">
+        <h3>🤖 Generate Custom AI Video</h3>
+        <p>Create personalized karate instruction videos tailored to your needs.</p>
+
+        <div class="generator-form">
+            <div class="form-row">
+                <select id="technique-select">
+                    <option value="">Select Technique</option>
+                    <option value="jab">Jab Punch</option>
+                    <option value="cross">Cross Punch</option>
+                    <option value="front-kick">Front Kick</option>
+                    <option value="roundhouse">Roundhouse Kick</option>
+                    <option value="side-kick">Side Kick</option>
+                    <option value="horse-stance">Horse Stance</option>
+                </select>
+
+                <select id="skill-level">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+
+                <button id="generate-video" class="btn-primary">🎬 Generate Video</button>
+            </div>
+        </div>
+
+        <div id="ai-video-result" class="ai-video-result" style="display: none;">
+            <h4>🎥 Your Custom AI Video</h4>
+            <div class="video-placeholder">
+                <div class="ai-animation">
+                    <div class="pulse"></div>
+                    <div class="pulse delay"></div>
+                    <div class="pulse delay2"></div>
+                </div>
+                <p>AI is generating your personalized karate video...</p>
+            </div>
+            <div id="generated-content"></div>
+        </div>
+    </div>
 
     <div class="filters" id="filters">
         <button class="filter-btn active" data-filter="All">All</button>
@@ -15,6 +231,7 @@
         <button class="filter-btn" data-filter="Combinations">Combinations</button>
         <button class="filter-btn" data-filter="Fundamentals">Fundamentals</button>
         <button class="filter-btn" data-filter="Sparring">Sparring</button>
+        <button class="filter-btn" data-filter="AI">🤖 AI Generated</button>
     </div>
 
     <div class="videos-grid" id="videosGrid">
@@ -51,7 +268,195 @@
 <script>
 const videos = {{ videos|tojson }};
 
-function openVideoModal(id) {
+// AI Video Generation
+document.getElementById('generate-video').addEventListener('click', function() {
+    const technique = document.getElementById('technique-select').value;
+    const skillLevel = document.getElementById('skill-level').value;
+
+    if (!technique) {
+        alert('Please select a technique first!');
+        return;
+    }
+
+    const resultDiv = document.getElementById('ai-video-result');
+    const contentDiv = document.getElementById('generated-content');
+
+    resultDiv.style.display = 'block';
+    contentDiv.innerHTML = '<p>🎬 Generating your personalized karate video...</p>';
+
+    // Simulate AI video generation (in a real app, this would call an AI service)
+    setTimeout(() => {
+        const aiContent = generateAICard(technique, skillLevel);
+        contentDiv.innerHTML = aiContent;
+    }, 3000);
+});
+
+function generateAICard(technique, skillLevel) {
+    const techniqueData = {
+        'jab': {
+            title: 'Perfect Jab Punch Technique',
+            duration: '3:45',
+            description: 'AI-generated tutorial focusing on speed, accuracy, and proper hip rotation for the jab punch.',
+            steps: [
+                'Start in natural stance with feet shoulder-width apart',
+                'Keep your left hand (for right-handed) as the jab hand',
+                'Rotate your fist so knuckles face up, thumb on top',
+                'Extend your arm straight forward while rotating your hips slightly',
+                'Keep your elbow slightly bent (not locked) to maintain speed',
+                'Retract immediately and return to guard position',
+                'Keep your right hand protecting your chin'
+            ],
+            tips: [
+                'Think of it as "poking" rather than "punching"',
+                'Keep your chin tucked behind your shoulder',
+                'Breathe out as you punch',
+                'Practice speed over power initially'
+            ]
+        },
+        'cross': {
+            title: 'Powerful Cross Punch Mastery',
+            duration: '4:20',
+            description: 'AI-analyzed cross punch with detailed biomechanics and power generation techniques.',
+            steps: [
+                'Start with lead foot forward, rear foot at 45-degree angle',
+                'Keep your rear hand (right for orthodox) as the power hand',
+                'Load your rear leg by bending it slightly',
+                'Rotate your rear foot, hips, and shoulders simultaneously',
+                'Drive your fist straight forward, palm facing down',
+                'Transfer your weight from rear to front foot',
+                'Keep your lead hand up for protection'
+            ],
+            tips: [
+                'Imagine twisting a towel to wring water out',
+                'Keep your eyes on the target throughout',
+                'Power comes from rotation, not just arm strength',
+                'Practice with slow motion first'
+            ]
+        },
+        'front-kick': {
+            title: 'Devastating Front Kick Technique',
+            duration: '3:30',
+            description: 'AI-optimized front kick with focus on balance, power, and target accuracy.',
+            steps: [
+                'Start in fighting stance with knees slightly bent',
+                'Chamber your knee up to waist height',
+                'Keep your supporting leg bent for stability',
+                'Extend your leg straight forward using hip flexors',
+                'Strike with the ball of your foot (not toes)',
+                'Keep your body upright, don\'t lean back',
+                'Retract quickly and return to stance'
+            ],
+            tips: [
+                'Think of pushing through a wall with your foot',
+                'Keep your core tight throughout',
+                'Practice balance on supporting leg',
+                'Start slow, focus on form'
+            ]
+        },
+        'roundhouse': {
+            title: 'Circular Power: Roundhouse Kick',
+            duration: '5:15',
+            description: 'AI-enhanced roundhouse kick tutorial with momentum analysis and technique breakdown.',
+            steps: [
+                'Start in fighting stance',
+                'Chamber your knee across your body to opposite shoulder',
+                'Rotate your supporting foot and hips toward the target',
+                'Swing your leg in a circular motion',
+                'Strike with your shin (not instep)',
+                'Keep your body upright and core engaged',
+                'Chamber leg and return to stance'
+            ],
+            tips: [
+                'Imagine your leg is a whip',
+                'Keep your eyes on the target',
+                'Practice the motion slowly first',
+                'Build up speed gradually'
+            ]
+        },
+        'side-kick': {
+            title: 'Lateral Force: Side Kick Mastery',
+            duration: '4:45',
+            description: 'AI-powered side kick analysis focusing on stability, power transfer, and precision.',
+            steps: [
+                'Turn sideways to the target, lead foot pointing toward it',
+                'Chamber your knee up and across your body',
+                'Keep your supporting leg straight and strong',
+                'Extend your leg straight out to the side',
+                'Strike with the heel or edge of your foot',
+                'Keep your body upright, don\'t lean',
+                'Retract and return to stance'
+            ],
+            tips: [
+                'Think of pushing a door open with your foot',
+                'Keep your core tight',
+                'Practice balance extensively',
+                'Start with slow, controlled motions'
+            ]
+        },
+        'horse-stance': {
+            title: 'Foundation of Power: Horse Stance',
+            duration: '6:00',
+            description: 'AI-detailed horse stance tutorial with muscle activation analysis and endurance building.',
+            steps: [
+                'Stand with feet about 2-3 shoulder widths apart',
+                'Turn toes slightly outward (about 45 degrees)',
+                'Bend knees until thighs are parallel to ground',
+                'Keep back straight and upright',
+                'Distribute weight evenly between both legs',
+                'Keep arms relaxed at sides or in guard position',
+                'Hold position while maintaining steady breathing'
+            ],
+            tips: [
+                'Imagine sitting back into a chair',
+                'Keep your weight in your heels',
+                'Breathe steadily and deeply',
+                'Start with shorter holds and build up'
+            ]
+        }
+    };
+
+    const data = techniqueData[technique];
+    if (!data) return '<p>Error generating video content.</p>';
+
+    return `
+        <div class="ai-video-card">
+            <div class="video-thumbnail ai-generated">
+                <span class="ai-icon">🤖</span>
+                <span class="duration">${data.duration}</span>
+                <div class="ai-badge">AI Generated</div>
+            </div>
+            <div class="video-info">
+                <h3>${data.title}</h3>
+                <p class="instructor">By AI Karate Instructor</p>
+                <p class="category">AI Generated</p>
+                <p class="difficulty">${skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1)}</p>
+                <p class="description">${data.description}</p>
+
+                <div class="ai-content">
+                    <h4>📋 Step-by-Step Instructions:</h4>
+                    <ol>
+                        ${data.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+
+                    <h4>💡 Pro Tips:</h4>
+                    <ul>
+                        ${data.tips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="button-group">
+                    <button class="play-full-btn">▶ Play AI Video</button>
+                    <button class="practice-btn" onclick="startPractice('${technique}')">Practice Mode</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function startPractice(technique) {
+    alert(`Starting practice mode for ${technique}!\n\nUse the AI Stance Checker to verify your form.`);
+    window.location.href = '/stance-check';
+}
     const video = videos.find(v => v.id === id);
     const modal = document.getElementById('videoModal');
     let html = `

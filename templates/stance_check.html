@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}Stance Checker - Karate Learning App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="technique-card">
+        <h1>🤖 AI Stance Checker</h1>
+        <p class="technique-description">
+            Use your camera to check your karate stance! The AI will analyze your posture and give you real-time feedback.
+        </p>
+
+        <div class="stance-checker">
+            <div class="controls">
+                <div class="stance-selector">
+                    <label for="stance-type">Select Stance to Check:</label>
+                    <select id="stance-type">
+                        <option value="horse">Horse Stance (Kiba Dachi)</option>
+                        <option value="fighting">Fighting Stance</option>
+                    </select>
+                </div>
+
+                <div class="buttons">
+                    <button id="start-camera" class="btn-primary">📹 Start Camera</button>
+                    <button id="capture" class="btn-secondary" disabled>📸 Analyze Stance</button>
+                    <button id="stop-camera" class="btn-danger" disabled>⏹️ Stop Camera</button>
+                </div>
+            </div>
+
+            <div class="camera-section">
+                <div class="video-container">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                </div>
+
+                <div class="analysis-results" id="results" style="display: none;">
+                    <h3>Analysis Results</h3>
+                    <div class="score-display">
+                        <div class="score-circle" id="score-circle">0%</div>
+                        <p id="score-text">Analyzing...</p>
+                    </div>
+                    <div class="feedback-list" id="feedback-list">
+                        <!-- Feedback will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="stance-guide">
+                <h3>📋 Stance Guidelines</h3>
+                <div id="stance-guide-content">
+                    <!-- Guide content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stance-checker {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #2c2c2c;
+    border-radius: 10px;
+}
+
+.stance-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.stance-selector label {
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.stance-selector select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-primary, .btn-secondary, .btn-danger {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #89c4f4;
+    color: #1a1a1a;
+}
+
+.btn-primary:hover {
+    background: #6bb3e6;
+}
+
+.btn-secondary {
+    background: #555;
+    color: #e0e0e0;
+}
+
+.btn-secondary:hover {
+    background: #666;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-primary:disabled, .btn-secondary:disabled, .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.camera-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.video-container {
+    position: relative;
+    background: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#video {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.analysis-results {
+    background: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.score-display {
+    margin-bottom: 20px;
+}
+
+.score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #89c4f4, #6bb3e6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 15px rgba(137, 196, 244, 0.3);
+}
+
+#score-text {
+    color: #e0e0e0;
+    font-size: 16px;
+}
+
+.feedback-list {
+    text-align: left;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.feedback-list div {
+    padding: 8px 0;
+    border-bottom: 1px solid #444;
+    font-size: 14px;
+}
+
+.feedback-list div:last-child {
+    border-bottom: none;
+}
+
+.stance-guide {
+    background: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.stance-guide h3 {
+    margin-top: 0;
+    color: #89c4f4;
+}
+
+.stance-guide ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.stance-guide li {
+    margin-bottom: 8px;
+    color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .camera-section {
+        grid-template-columns: 1fr;
+    }
+
+    .controls {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .buttons {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const startBtn = document.getElementById('start-camera');
+    const captureBtn = document.getElementById('capture');
+    const stopBtn = document.getElementById('stop-camera');
+    const stanceType = document.getElementById('stance-type');
+    const resultsDiv = document.getElementById('results');
+    const scoreCircle = document.getElementById('score-circle');
+    const scoreText = document.getElementById('score-text');
+    const feedbackList = document.getElementById('feedback-list');
+    const guideContent = document.getElementById('stance-guide-content');
+
+    let stream = null;
+
+    // Stance guides
+    const stanceGuides = {
+        horse: `
+            <h4>Horse Stance (Kiba Dachi) Guidelines:</h4>
+            <ul>
+                <li>Feet should be 2-3 shoulder widths apart</li>
+                <li>Knees bent at 90-degree angle</li>
+                <li>Thighs parallel to the ground</li>
+                <li>Back straight and upright</li>
+                <li>Weight evenly distributed</li>
+                <li>Arms relaxed at sides</li>
+            </ul>
+        `,
+        fighting: `
+            <h4>Fighting Stance Guidelines:</h4>
+            <ul>
+                <li>One foot forward (staggered stance)</li>
+                <li>Knees slightly bent</li>
+                <li>Hands up protecting face</li>
+                <li>Lead hand at chin level</li>
+                <li>Rear hand at cheek level</li>
+                <li>Weight balanced but ready to move</li>
+            </ul>
+        `
+    };
+
+    // Update guide when stance changes
+    stanceType.addEventListener('change', function() {
+        guideContent.innerHTML = stanceGuides[this.value];
+    });
+
+    // Initialize guide
+    guideContent.innerHTML = stanceGuides[stanceType.value];
+
+    startBtn.addEventListener('click', async function() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 }
+            });
+
+            video.srcObject = stream;
+            startBtn.disabled = true;
+            captureBtn.disabled = false;
+            stopBtn.disabled = false;
+            resultsDiv.style.display = 'block';
+
+        } catch (err) {
+            alert('Error accessing camera: ' + err.message);
+        }
+    });
+
+    captureBtn.addEventListener('click', function() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        // Convert to base64
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+
+        // Show analyzing state
+        scoreCircle.textContent = '...';
+        scoreText.textContent = 'Analyzing your stance...';
+        feedbackList.innerHTML = '<div>🤖 AI is analyzing your posture...</div>';
+
+        // Send to server for analysis
+        fetch('/api/analyze-stance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                image: imageData,
+                stance_type: stanceType.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update score
+                scoreCircle.textContent = data.score + '%';
+                scoreText.textContent = getScoreMessage(data.score);
+
+                // Update color based on score
+                if (data.score >= 80) {
+                    scoreCircle.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+                } else if (data.score >= 60) {
+                    scoreCircle.style.background = 'linear-gradient(135deg, #FF9800, #e68900)';
+                } else {
+                    scoreCircle.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
+                }
+
+                // Update feedback
+                feedbackList.innerHTML = data.feedback.map(item =>
+                    `<div>${item}</div>`
+                ).join('');
+
+            } else {
+                scoreCircle.textContent = '❌';
+                scoreText.textContent = 'Analysis failed';
+                feedbackList.innerHTML = `<div>❌ ${data.error}</div>`;
+            }
+        })
+        .catch(error => {
+            scoreCircle.textContent = '❌';
+            scoreText.textContent = 'Error';
+            feedbackList.innerHTML = `<div>❌ Failed to analyze: ${error.message}</div>`;
+        });
+    });
+
+    stopBtn.addEventListener('click', function() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            stream = null;
+        }
+
+        startBtn.disabled = false;
+        captureBtn.disabled = true;
+        stopBtn.disabled = true;
+    });
+
+    function getScoreMessage(score) {
+        if (score >= 90) return 'Excellent form! 🏆';
+        if (score >= 80) return 'Great job! 👍';
+        if (score >= 70) return 'Good, minor adjustments needed';
+        if (score >= 60) return 'Keep working on form';
+        return 'Needs significant improvement';
+    }
+});
+</script>
+{% endblock %}
