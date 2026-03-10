@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Progress - Karate Learning Academy{% endblock %}
+
+{% block content %}
+<div class="progress-page">
+    <h2>Your Progress Dashboard</h2>
+    <p class="subtitle">Track your karate journey</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-icon">⭐</span>
+            <h3>Total Points</h3>
+            <p class="stat-value">{{ progress.total_points }}</p>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">🥋</span>
+            <h3>Belt Level</h3>
+            <p class="stat-value">{{ progress.level }}</p>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">📚</span>
+            <h3>Techniques Learned</h3>
+            <p class="stat-value">{{ progress.completed_techniques }}</p>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">💪</span>
+            <h3>Drills Completed</h3>
+            <p class="stat-value">{{ progress.completed_drills }}</p>
+        </div>
+    </div>
+
+    <div class="belt-section">
+        <h3>Current Belt Rank</h3>
+        <div class="belt-display">
+            <div class="belt"></div>
+            <div class="belt-info">
+                <h2>{{ progress.current_belt }}</h2>
+                <p>Level {{ progress.level }} of 8</p>
+            </div>
+        </div>
+
+        <div class="progress-bar-section">
+            <div class="progress-info">
+                <span>Progress to Next Level</span>
+                <span class="points">{{ progress.total_points }} points</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ progress.progress_percentage }}%"></div>
+            </div>
+            <div class="progress-percentage">{{ progress.progress_percentage }}%</div>
+        </div>
+
+        <div class="progression-path">
+            <h3>Belt Progression Path</h3>
+            <div class="belts-timeline">
+                {% for belt in belts %}
+                <div class="belt-item {% if belt.level <= progress.level %}completed{% endif %} {% if belt.level == progress.level %}current{% endif %}">
+                    <div class="belt-circle"></div>
+                    <p>{{ belt.name }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="achievements-section">
+        <h3>🏆 Your Achievements</h3>
+        <div class="achievements-grid">
+            <div class="achievement-card">
+                <span class="achievement-icon">🥋</span>
+                <h4>Beginner's Journey</h4>
+                <p>Earned after reaching Yellow Belt</p>
+                <progress value="{{ [progress.level, 2] | min }}" max="2"></progress>
+            </div>
+            <div class="achievement-card">
+                <span class="achievement-icon">🔥</span>
+                <h4>Dedicated Practitioner</h4>
+                <p>Earned after 10 completed drills</p>
+                <progress value="{{ [progress.completed_drills, 10] | min }}" max="10"></progress>
+            </div>
+            <div class="achievement-card">
+                <span class="achievement-icon">📚</span>
+                <h4>Technique Master</h4>
+                <p>Earned after learning 6 techniques</p>
+                <progress value="{{ [progress.completed_techniques, 6] | min }}" max="6"></progress>
+            </div>
+            <div class="achievement-card">
+                <span class="achievement-icon">⭐</span>
+                <h4>Rising Champion</h4>
+                <p>Earned after 500 total points</p>
+                <progress value="{{ [progress.total_points, 500] | min }}" max="500"></progress>
+            </div>
+        </div>
+    </div>
+
+    <div class="recommendations">
+        <h3>📋 Personalized Recommendations</h3>
+        <div class="recommendation-list">
+            <div class="recommendation-item">
+                <span class="rec-icon">✨</span>
+                <p>You're {{ progress.progress_percentage }}% of the way to your next belt! Keep practicing to advance.</p>
+            </div>
+            <div class="recommendation-item">
+                <span class="rec-icon">💡</span>
+                <p>Try practicing more techniques to unlock new drills and increase your skills.</p>
+            </div>
+            <div class="recommendation-item">
+                <span class="rec-icon">🎯</span>
+                <p>Complete 3 more drills this week to stay on pace for your next belt level.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
